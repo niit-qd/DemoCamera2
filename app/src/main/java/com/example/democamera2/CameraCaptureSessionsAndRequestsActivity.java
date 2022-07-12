@@ -54,7 +54,7 @@ public class CameraCaptureSessionsAndRequestsActivity extends AppCompatActivity 
 
     private static final int IMAGE_READER_WIDTH = 600;
     private static final int IMAGE_READER_HEIGHT = 400;
-    private static final int IMAGE_READER_FORMAT = PixelFormat.JPEG; // ImageFormat.JPEG;
+    private static final int IMAGE_READER_FORMAT = ImageFormat.JPEG; // PixelFormat.JPEG; // ImageFormat.JPEG;
     private static final int IMAGE_READER_MAX_IMAGES = 2;
 
     private Spinner sCamera;
@@ -340,6 +340,7 @@ public class CameraCaptureSessionsAndRequestsActivity extends AppCompatActivity 
                 image.close();
             }
         };
+        imageReader.setOnImageAvailableListener(imageReaderOnImageAvailableListener, handler);
     }
 
     private void cleanEnvironment() {
@@ -464,13 +465,12 @@ public class CameraCaptureSessionsAndRequestsActivity extends AppCompatActivity 
         if (null == session) {
             return;
         }
-        imageReader.setOnImageAvailableListener(imageReaderOnImageAvailableListener, handler);
         try {
             // https://developer.android.google.cn/training/camera2/capture-sessions-requests#interleaving-capture-requests
             // Create the single request and dispatch it
             // NOTE: This may disrupt the ongoing repeating request momentarily
             CaptureRequest.Builder singleRequest = session.getDevice().createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-//            singleRequest.addTarget(svCamera.getHolder().getSurface());
+            singleRequest.addTarget(svCamera.getHolder().getSurface());
             singleRequest.addTarget(imageReader.getSurface());
             int captureSequenceId = session.capture(singleRequest.build(), cameraCaptureSessionCaptureCallback, handler);
         } catch (CameraAccessException e) {
